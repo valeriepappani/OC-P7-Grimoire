@@ -1,34 +1,70 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const app = express();
+const Book = require('./models/book');
+
+mongoose.connect('mongodb+srv://valeriep:moABuxkApdxVqvnz@cluster0.xb9uekf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log('Connexion à MongoDB réussie !'))
+    .catch(() => console.log('Connexion à MongoDB échouée !'));
+
+app.use(express.json());
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
+});
+
+//Création d'un livre
+app.post('/api/books', (req, res, next) => {
+    delete req.body._id;
+    const book = new Book({
+        ...req.body
+    });
+    thing.save()
+        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+        .catch(error => res.status(400).json({ error }));
+});
+
+//   app.post('/api/books', (req, res, next) => {
+//     console.log(req.body);
+//     res.status(201).json({
+//       message: 'Objet créé !'
+//     });
+//   });
+
+//MAJ d'un livre
+app.put('/api/books/:id', (req, res, next) => {
+    Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+      .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+      .catch(error => res.status(400).json({ error }));
   });
 
-app.use('/api/books', (req, res, next) => {
-    const books = [
-        {
-            userId: 'String', //identifiant MongoDB unique de l'utilisateur qui a créé le livre
-            title: 'String', //titre du livre
-            author: 'String', //auteur du livre
-            imageUrl: 'https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', //illustration/couverture du livre
-            year: 1992, //année de publication du livre
-            genre: 'String', //genre du livre
-            ratings: [
-                {
-                    userId: 'String', //identifiant MongoDB unique de l'utilisateur qui a noté le livre
-                    grade: 5 // note donnée à un livre
-                }
-            ], // notes données à un livre
-            averageRating: 3 //- note moyenne du livre
-        }
+  //Suppression d'un livre
+  app.delete('/api/books/:id', (req, res, next) => {
+    Book.deleteOne({ _id: req.params.id })
+      .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+      .catch(error => res.status(400).json({ error }));
+  });
 
-    ];
-    res.status(200).json(books);
+//Récupération d'un livre spécifique grâce à son id
+app.get('/api/books/:id', (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
+        .then(book => res.status(200).json(book))
+        .catch(error => res.status(404).json({ error }));
+});
+
+// Récupération de tous les livres
+app.get('/api/books', (req, res, next) => {
+    Book.find()
+        .then(books => res.status(200).json(books))
+        .catch(error => res.status(400).json({ error }));
 });
 
 module.exports = app;
