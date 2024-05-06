@@ -1,8 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const userRoutes = require ('./routes/user')
+const bookRoutes = require('./routes/book');
+
 const app = express();
-const Book = require('./models/book');
+const path = require('path');
 
 mongoose.connect('mongodb+srv://valeriep:moABuxkApdxVqvnz@cluster0.xb9uekf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
     {
@@ -21,50 +24,10 @@ app.use((req, res, next) => {
     next();
 });
 
-//Création d'un livre
-app.post('/api/books', (req, res, next) => {
-    delete req.body._id;
-    const book = new Book({
-        ...req.body
-    });
-    thing.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-        .catch(error => res.status(400).json({ error }));
-});
 
-//   app.post('/api/books', (req, res, next) => {
-//     console.log(req.body);
-//     res.status(201).json({
-//       message: 'Objet créé !'
-//     });
-//   });
+app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/api/books', bookRoutes);
+app.use('/api/auth', userRoutes);
 
-//MAJ d'un livre
-app.put('/api/books/:id', (req, res, next) => {
-    Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-      .catch(error => res.status(400).json({ error }));
-  });
-
-  //Suppression d'un livre
-  app.delete('/api/books/:id', (req, res, next) => {
-    Book.deleteOne({ _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-      .catch(error => res.status(400).json({ error }));
-  });
-
-//Récupération d'un livre spécifique grâce à son id
-app.get('/api/books/:id', (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
-        .then(book => res.status(200).json(book))
-        .catch(error => res.status(404).json({ error }));
-});
-
-// Récupération de tous les livres
-app.get('/api/books', (req, res, next) => {
-    Book.find()
-        .then(books => res.status(200).json(books))
-        .catch(error => res.status(400).json({ error }));
-});
 
 module.exports = app;
