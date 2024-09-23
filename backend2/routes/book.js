@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bookCtrl = require('../controllers/book');
 
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 router.get('/', bookCtrl.getAllBook); // Récupération de tous les livres

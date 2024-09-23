@@ -85,7 +85,7 @@ exports.addRating = (req, res, next) => {
                 book.ratings.push({ userId: req.body.userId, grade: req.body.rating });
                 book.averageRating = parseFloat((book.ratings.reduce((a, b) => a + b.grade, 0) / book.ratings.length).toFixed(1));
 
-                Book.findOneAndUpdate({ _id: req.params.id }, { $push: { ratings: { userId: req.body.userId, grade: req.body.rating } }, $set: { averageRating: book.averageRating } }, {new: true})
+                Book.findOneAndUpdate({ _id: req.params.id }, { $push: { ratings: { userId: req.body.userId, grade: req.body.rating } }, $set: { averageRating: book.averageRating } }, { new: true })
                     .then((bookModified) => res.status(200).json(bookModified))
                     .catch(error => res.status(400).json({ error }));
             }
