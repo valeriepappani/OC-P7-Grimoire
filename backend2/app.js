@@ -28,9 +28,9 @@ app.use((req, res, next) => {
 
 // Configuration du rate limiter pour les routes d'authentification
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 10 * 60 * 1000, // 15 minutes
     max: 5, // Limite chaque IP à 5 requêtes par windowMs
-    message: "Trop de tentatives de connexion, veuillez réessayer dans 15 minutes."
+    message: "Trop de tentatives de connexion, veuillez réessayer dans 10 minutes."
 });
 
 // Routes

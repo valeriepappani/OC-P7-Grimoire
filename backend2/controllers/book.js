@@ -79,17 +79,32 @@ exports.getBestRatedBooks = (req, res, next) => {
 }
 
 exports.addRating = (req, res, next) => {
+    const rating = req.body.rating;
+
+    // Vérification si la note est bien comprise entre 0 et 5
+    if (rating < 0 || rating > 5) {
+        return res.status(400).json({ message: 'La note doit être comprise entre 0 et 5 !' });
+    }
+
     Book.findOne({ _id: req.params.id })
         .then((book) => {
             if (!book.ratings.some(rating => rating.userId === req.auth.userId)) {
-                book.ratings.push({ userId: req.body.userId, grade: req.body.rating });
+                book.ratings.push({ userId: req.auth.userId, grade: rating });
                 book.averageRating = parseFloat((book.ratings.reduce((a, b) => a + b.grade, 0) / book.ratings.length).toFixed(1));
 
-                Book.findOneAndUpdate({ _id: req.params.id }, { $push: { ratings: { userId: req.body.userId, grade: req.body.rating } }, $set: { averageRating: book.averageRating } }, { new: true })
-                    .then((bookModified) => res.status(200).json(bookModified))
-                    .catch(error => res.status(400).json({ error }));
+                Book.findOneAndUpdate(
+                    { _id: req.params.id },
+                    { 
+                        $push: { ratings: { userId: req.auth.userId, grade: rating } }, 
+                        $set: { averageRating: book.averageRating } 
+                    },
+                    { new: true }
+                )
+                .then((bookModified) => res.status(200).json(bookModified))
+                .catch(error => res.status(400).json({ error }));
+            } else {
+                res.status(401).json({ message: 'Vous avez déjà publié une note !' });
             }
-            else res.status(401).json({ message: 'Vous avez déjà publié une note !' });
         })
         .catch(error => res.status(400).json({ error }));
-}
+};
