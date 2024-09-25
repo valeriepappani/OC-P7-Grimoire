@@ -81,7 +81,7 @@ exports.getBestRatedBooks = (req, res, next) => {
 exports.addRating = (req, res, next) => {
     Book.findOne({ _id: req.params.id })
         .then((book) => {
-            if (!book.ratings.some(rating => rating.userId === req.body.userId)) {
+            if (!book.ratings.some(rating => rating.userId === req.auth.userId)) {
                 book.ratings.push({ userId: req.body.userId, grade: req.body.rating });
                 book.averageRating = parseFloat((book.ratings.reduce((a, b) => a + b.grade, 0) / book.ratings.length).toFixed(1));
 

@@ -6,8 +6,10 @@ const userRoutes = require('./routes/user');
 const bookRoutes = require('./routes/book');
 const app = express();
 
+require('dotenv').config(); // Importer dotenv
+
 // Connexion à MongoDB
-mongoose.connect('mongodb+srv://valeriep:moABuxkApdxVqvnz@cluster0.xb9uekf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })

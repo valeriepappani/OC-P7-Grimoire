@@ -5,6 +5,8 @@ const emailValidator = require('email-validator'); // Importation de email-valid
 
 const User = require('../models/user');
 
+require('dotenv').config();
+
 exports.signup = (req, res, next) => {
     const password = req.body.password;
     const email = req.body.email;
@@ -65,13 +67,17 @@ exports.login = (req, res, next) => {
                     if (!valid) {
                         return res.status(401).json({ error: 'Mot de passe incorrect !' });
                     }
+
+                    console.log('JWT_SECRET:', process.env.JWT_SECRET); // Log de la clé secrète
+
+                    const token = jwt.sign(
+                        { userId: user._id },
+                        process.env.JWT_SECRET,
+                        { expiresIn: '24h' }
+                    );
                     res.status(200).json({
                         userId: user._id,
-                        token: jwt.sign(
-                            { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
-                            { expiresIn: '24h' }
-                        )
+                        token: token
                     });
                 })
                 .catch(error => res.status(500).json({ error }));
